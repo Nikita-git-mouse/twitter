@@ -5,22 +5,24 @@ import { JwtModule } from '@nestjs/jwt';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { ConfigInterface, loaders } from '../config';
-import { JwtMiddleware } from './auth/infrasturcture';
+import { JwtMiddleware } from './auth/middlewares';
 
 import { UsersModule } from './users';
 import { AuthModule } from './auth';
-import { GalleryModule } from './gallery';
-import { ObjectModule } from './objects';
+import { WallModule } from './records-wall/wall.module';
+import { RecordModule } from './records';
 import { PermissionModule } from './permissions';
 
-import { UserEntity } from './users/infrasturcture/entities';
-import { AuthEntity } from './auth/infrasturcture/entities';
-import { GalleryEntity } from './gallery/infrasturcture/entities';
-import { ObjectEntity } from './objects/infrasturcture/entities';
+import { UserEntity } from './users/entity/user.entity';
+import { AuthEntity } from './auth/entity/auth.entity';
+import { WallEntity } from './records-wall/entity/wall.entity';
+import { RecordEntity } from './records/entity/record.entity';
 import {
-  GalleryPermissionEntity,
-  ObjectPermissionEntity,
-} from './permissions/infrastructure/entities';
+  WallPermissionEntity,
+  RecordPermissionEntity,
+} from './permissions/entities';
+import { LikesModule } from './likes/likes.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -41,10 +43,10 @@ import {
           entities: [
             UserEntity,
             AuthEntity,
-            GalleryEntity,
-            ObjectEntity,
-            ObjectPermissionEntity,
-            GalleryPermissionEntity,
+            WallEntity,
+            RecordEntity,
+            RecordPermissionEntity,
+            WallPermissionEntity,
           ],
           username,
           password,
@@ -60,10 +62,12 @@ import {
     }),
     UsersModule,
     PermissionModule,
-    ObjectModule,
+    RecordModule,
     AuthModule,
-    GalleryModule,
+    WallModule,
     JwtModule,
+    // FollowModule,
+    // LikesModule,
   ],
   providers: [JwtMiddleware],
 })

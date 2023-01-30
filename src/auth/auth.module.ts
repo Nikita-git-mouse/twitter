@@ -3,13 +3,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
-import { AuthController } from './presentation';
-import { AuthService } from './application';
-import {
-  AuthRepository,
-  EmailService,
-  RefreshJwtMiddleware,
-} from './infrasturcture';
+import { AuthController } from './controller';
+import { AuthService } from './repository';
+import { AuthRepository } from './repository/auth.repository'
+import { EmailService } from './mailer'
+import { RefreshJwtMiddleware } from './middlewares'
 import { UsersModule } from '../users';
 import { resolve } from 'path';
 

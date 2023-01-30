@@ -1,30 +1,30 @@
 import { Module } from '@nestjs/common';
-import { GalleryModule } from '../gallery';
+import { WallModule } from '../records-wall/wall.module';
 import {
-  GalleryPermissionService,
-  ObjectPermissionService,
-} from './application';
-import { GalleryPermissionDomain, ObjectPermissionDomain } from './domain';
+  WallPermissionService,
+  RecordPermissionService,
+} from './repository';
+import { WallPermissionDomain, RecordPermissionDomain } from './access';
 import {
-  GalleryPermissionRepository,
-  ObjectPermissionRepository,
-} from './infrastructure';
+  WallPermissionRepository,
+  RecordPermissionRepository,
+} from './repository/repositories';
 import {
-  GalleryPermissionController,
-  ObjectPermissionController,
-} from './presentation';
+  WallPermissionController,
+  RecordPermissionController,
+} from './controller';
 
 @Module({
-  controllers: [GalleryPermissionController, ObjectPermissionController],
-  imports: [GalleryModule],
+  controllers: [WallPermissionController, RecordPermissionController],
+  imports: [WallModule],
   providers: [
-    GalleryPermissionService,
-    ObjectPermissionService,
-    GalleryPermissionRepository,
-    ObjectPermissionRepository,
-    ObjectPermissionDomain,
-    GalleryPermissionDomain,
+    WallPermissionService,
+    RecordPermissionService,
+    WallPermissionRepository,
+    RecordPermissionRepository,
+    RecordPermissionDomain,
+    WallPermissionDomain,
   ],
-  exports: [GalleryPermissionService, ObjectPermissionService],
+  exports: [WallPermissionService, RecordPermissionService],
 })
 export class PermissionModule {}

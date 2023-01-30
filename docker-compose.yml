@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres
+    container_name: twitter
+    image: postgres:14
     ports:
       - ${POSTGRES_PORT:?err}:5432
     environment:

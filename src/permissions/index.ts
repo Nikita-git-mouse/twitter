@@ -1,2 +1,2 @@
 export * from './permission.module';
-export * from './application';
+export * from './repository';

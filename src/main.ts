@@ -23,7 +23,6 @@ async function bootstrap() {
 
   app.setGlobalPrefix('/api');
 
-  // cors
   app.enableCors();
 
   // pipes

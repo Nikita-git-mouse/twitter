@@ -12,7 +12,10 @@ import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
 import { AuthService } from '../repository';
-import { REFRESH_TOKEN_COOKIE_NAME_TOKEN } from '../core';
+import {
+  REFRESH_TOKEN_COOKIE_NAME_TOKEN,
+  SESSION_ID_COOKIE_NAME_TOKEN,
+} from '../core';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
 import { UserSignInInput, UserSignUpInput } from './inputs';
 
@@ -41,13 +44,10 @@ export class AuthController {
   ) {
     const { data } = await this.authService.singIn(input);
 
-    const { accessToken, refreshToken } = data;
+    const { sessionId, refreshToken } = data;
 
+    this.setSessionId(response, sessionId);
     this.setRefreshToken(response, refreshToken);
-
-    return {
-      accessToken,
-    };
   }
 
   @Post('/sign-out')
@@ -56,11 +56,14 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Req() request: Request,
   ) {
-    const { id } = request.refresh;
+    const { id, sessionId } = request.refresh;
 
-    await this.authService.signOut({ userId: id });
+    await this.authService.signOut({
+      sessionId,
+      userId: id,
+    });
 
-    this.clearRefreshToken(response);
+    this.clearCookies(response);
   }
 
   @Post('/refresh')
@@ -69,24 +72,25 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @Req() request: Request,
   ) {
-    const { id } = request.refresh;
+    const { refreshToken } = request.refresh;
 
-    const { data } = await this.authService.refresh({ userId: id });
+    const { data } = await this.authService.refresh({
+      refreshToken,
+    });
 
-    const { accessToken, refreshToken } = data;
-
-    this.setRefreshToken(response, refreshToken);
-
-    return {
-      accessToken,
-    };
+    this.setSessionId(response, data.sessionId);
+    this.setRefreshToken(response, data.refreshToken);
   }
 
   private setRefreshToken(response: Response, refreshToken: string) {
     response.cookie(REFRESH_TOKEN_COOKIE_NAME_TOKEN, refreshToken);
   }
+  private setSessionId(response: Response, sessionId: string) {
+    response.cookie(SESSION_ID_COOKIE_NAME_TOKEN, sessionId);
+  }
 
-  private clearRefreshToken(response: Response) {
+  private clearCookies(response: Response) {
     response.clearCookie(REFRESH_TOKEN_COOKIE_NAME_TOKEN);
+    response.clearCookie(SESSION_ID_COOKIE_NAME_TOKEN);
   }
 }

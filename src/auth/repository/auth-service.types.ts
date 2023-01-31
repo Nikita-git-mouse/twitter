@@ -13,24 +13,25 @@ export interface UserSignInParams {
 
 export type UserSignInResult = {
   data: {
-    accessToken: string;
+    sessionId: string;
     refreshToken: string;
   };
 };
 
 export interface UserSignOutParams {
   userId: number;
+  sessionId: string;
 }
 
 export type UserSignOutResult = undefined;
 
 export interface UserRefreshTokenParams {
-  userId: number;
+  refreshToken: string;
 }
 
 export type UserRefreshTokenResult = {
   data: {
-    accessToken: string;
+    sessionId: string;
     refreshToken: string;
   };
 };

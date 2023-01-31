@@ -9,7 +9,7 @@ import { UpdateUserInput } from './update-user.input';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
-  
+
   @Get('/:userId')
   async getUserById(@Param('userId') userId: string) {
     const { data } = await this.usersService.getById({ userId: +userId });
@@ -31,7 +31,7 @@ export class UsersController {
 
   @Get('/:name/username')
   async getUserByName(@Param('name') name: string) {
-    const { data } = await this.usersService.getByName({ name: name })
+    const { data } = await this.usersService.getByName({ name: name });
     return data;
   }
 }

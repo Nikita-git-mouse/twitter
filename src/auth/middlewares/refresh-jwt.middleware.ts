@@ -4,7 +4,11 @@ import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 
 import { ConfigInterface } from '../../../config';
-import { JwtPayload, REFRESH_TOKEN_COOKIE_NAME_TOKEN } from '../core';
+import {
+  JwtPayload,
+  REFRESH_TOKEN_COOKIE_NAME_TOKEN,
+  SESSION_ID_COOKIE_NAME_TOKEN,
+} from '../core';
 
 @Injectable()
 export class RefreshJwtMiddleware implements NestMiddleware {
@@ -15,6 +19,7 @@ export class RefreshJwtMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: (error?: any) => void) {
     const token = req.cookies[REFRESH_TOKEN_COOKIE_NAME_TOKEN];
+    const sessionId = req.cookies[SESSION_ID_COOKIE_NAME_TOKEN];
 
     if (!token) {
       return next();
@@ -25,9 +30,10 @@ export class RefreshJwtMiddleware implements NestMiddleware {
     try {
       const isVerify = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: refreshTokenSecretKey,
+        ignoreExpiration: true,
       });
 
-      req.refresh = isVerify;
+      req.refresh = { ...isVerify, refreshToken: token, sessionId };
     } catch (error: any) {}
 
     next();

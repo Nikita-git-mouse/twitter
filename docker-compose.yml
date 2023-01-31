@@ -13,3 +13,11 @@ services:
       - POSTGRES_HOST=${POSTGRES_HOST:?err}
     volumes:
       - './volumes/postgres:/var/lib/postgresql'
+
+  redis:
+    image: redis:alpine
+    command: redis-server --include /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - '8379:6379'

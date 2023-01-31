@@ -1,11 +1,16 @@
 import {} from '../config';
 import { JwtPayload } from '../src/auth/core';
 
+interface RefreshPayload extends JwtPayload {
+  refreshToken: string;
+  sessionId: string;
+}
+
 declare global {
   namespace Express {
     interface Request {
       user: JwtPayload;
-      refresh: JwtPayload;
+      refresh: RefreshPayload;
     }
   }
 }

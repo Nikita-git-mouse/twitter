@@ -23,6 +23,10 @@ import {
 } from './permissions/entities';
 import { LikesModule } from './likes/likes.module';
 import { FollowModule } from './follow/follow.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
+import { RefreshTokenEntity } from './auth/entity/refreshTokens.entity';
+import { SessionEntity } from './sessions/session.entity';
+import { SessionModule } from './sessions/session.module';
 
 @Module({
   imports: [
@@ -41,6 +45,8 @@ import { FollowModule } from './follow/follow.module';
           type: 'postgres',
           migrations: [],
           entities: [
+            RefreshTokenEntity,
+            SessionEntity,
             UserEntity,
             AuthEntity,
             WallEntity,
@@ -66,8 +72,14 @@ import { FollowModule } from './follow/follow.module';
     AuthModule,
     WallModule,
     JwtModule,
+    SessionModule,
     // FollowModule,
     // LikesModule,
+    RedisModule.forRoot({
+      config: {
+        url: 'redis://localhost:8379',
+      },
+    }),
   ],
   providers: [JwtMiddleware],
 })

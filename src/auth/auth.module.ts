@@ -5,17 +5,25 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 
 import { AuthController } from './controller';
 import { AuthService } from './repository';
-import { AuthRepository } from './repository/auth.repository'
-import { EmailService } from './mailer'
-import { RefreshJwtMiddleware } from './middlewares'
+import { AuthRepository } from './repository/auth.repository';
+import { EmailService } from './mailer';
+import { RefreshJwtMiddleware } from './middlewares';
 import { UsersModule } from '../users';
 import { resolve } from 'path';
+import { RefreshTokensRepository } from './repository/refresh-tokens.repository';
+import { SessionModule } from '../sessions/session.module';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, EmailService],
+  providers: [
+    AuthService,
+    AuthRepository,
+    EmailService,
+    RefreshTokensRepository,
+  ],
   imports: [
     UsersModule,
+    SessionModule,
     JwtModule,
     MailerModule.forRoot({
       transport: {

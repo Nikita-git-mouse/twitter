@@ -9,7 +9,7 @@ import { genSalt, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 import { UsersService } from '../../users';
-import { AuthRepository } from './auth.repository'
+import { AuthRepository } from './auth.repository';
 import { EmailService } from '../mailer';
 import {
   UserRefreshTokenParams,
@@ -26,6 +26,10 @@ import {
 import { JwtPayload, Roles } from '../core';
 import { ConfigService } from '@nestjs/config';
 import { ConfigInterface } from '../../../config';
+import { RefreshTokensRepository } from './refresh-tokens.repository';
+import { v4 } from 'uuid';
+import { SessionService } from '../../sessions/session.service';
+import { RefreshPayload } from '../../../typings';
 
 @Injectable()
 export class AuthService {
@@ -35,6 +39,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<ConfigInterface>,
     private readonly emailService: EmailService,
+    private readonly refreshTokenRepository: RefreshTokensRepository,
+    private readonly sessionService: SessionService,
   ) {}
 
   async signUp(params: UserSignUpParams): Promise<UserSignUpResult> {
@@ -74,8 +80,6 @@ export class AuthService {
           throw new BadRequestException('user already exists');
         }
       }
-
-      console.log(error);
       throw new InternalServerErrorException('try again later');
     }
 
@@ -107,18 +111,42 @@ export class AuthService {
       );
 
       if (isCompared) {
+        const countSessions = await this.sessionService.countSessions(
+          userCreds.user.id,
+        );
+
+        if (countSessions >= 10) {
+          await this.sessionService.deleteLastSession(userCreds.user.id);
+        }
+
+        const sessionId = `session-${Date.now()}-${v4()}`;
+        const payload = JSON.stringify({
+          id: userCreds.user.id,
+          role: Roles.User,
+        });
+
         const tokens = await this.generateTokens({
           id: userCreds.user.id,
           role: Roles.User,
         });
 
-        await this.authRepository.update(
-          { id: userCreds.id },
-          { refreshToken: tokens.refreshToken },
+        const newSession = await this.sessionService.createSession(
+          sessionId,
+          userCreds.user,
+          payload,
         );
 
+        await this.refreshTokenRepository.save({
+          refreshToken: tokens.refreshToken,
+          session: newSession,
+          user: userCreds.user,
+        });
+
         return {
-          data: tokens,
+          data: {
+            sessionId,
+            refreshToken: tokens.refreshToken,
+          },
         };
       }
 
@@ -129,7 +157,7 @@ export class AuthService {
   }
 
   async signOut(params: UserSignOutParams): Promise<UserSignOutResult> {
-    const { userId } = params;
+    const { userId, sessionId } = params;
 
     const userCreds = await this.authRepository.findOne({
       where: {
@@ -146,10 +174,11 @@ export class AuthService {
       throw new BadRequestException('email or password is invalid');
     }
 
-    await this.authRepository.update(
-      { id: userCreds.id },
-      { refreshToken: '' },
-    );
+    await this.sessionService.deleteSessionById(userId, sessionId);
+    await this.refreshTokenRepository.delete({
+      session: { sessionId },
+      user: { id: userId },
+    });
 
     return;
   }
@@ -157,34 +186,66 @@ export class AuthService {
   async refresh(
     params: UserRefreshTokenParams,
   ): Promise<UserRefreshTokenResult> {
-    const { userId } = params;
+    const { refreshToken } = params;
 
-    const userCreds = await this.authRepository.findOne({
+    const refresh = await this.refreshTokenRepository.findOne({
       where: {
-        user: {
-          id: userId,
-        },
+        refreshToken: refreshToken,
       },
       relations: {
         user: true,
+        session: true,
       },
     });
 
-    if (!userCreds) {
-      throw new BadRequestException('email or password is invalid');
+    if (!refresh) {
+      throw new UnauthorizedException();
     }
-    const tokens = await this.generateTokens({
-      id: userCreds.user.id,
-      role: Roles.User,
+
+    const isVerified = await this.verifyRefreshToken(refreshToken);
+
+    await this.sessionService.deleteSessionById(
+      refresh.user.id,
+      refresh.session.sessionId,
+    );
+    await this.refreshTokenRepository.delete({
+      id: refresh.id,
     });
 
-    await this.authRepository.update(
-      { id: userCreds.id },
-      { refreshToken: tokens.refreshToken },
+    if (!isVerified) {
+      throw new UnauthorizedException();
+    }
+
+    const payload = {
+      id: refresh.user.id,
+      role: Roles.User,
+    };
+    const tokens = await this.generateTokens(payload);
+
+    // await this.authRepository.update(
+    //   { id: userCreds.id },
+    //   { refreshToken: tokens.refreshToken },
+    // );
+
+    const sessionId = `session-${Date.now()}-${v4()}`;
+
+    const newSession = await this.sessionService.createSession(
+      sessionId,
+      refresh.user,
+      JSON.stringify(payload),
     );
 
+    await this.refreshTokenRepository.save({
+      refreshToken: tokens.refreshToken,
+      session: newSession,
+      user: refresh.user,
+    });
+
     return {
-      data: tokens,
+      data: {
+        sessionId,
+        refreshToken: tokens.refreshToken,
+      },
     };
   }
 
@@ -249,7 +310,23 @@ export class AuthService {
     }
   }
 
-  private async generateTokens(payload: JwtPayload): Promise<{
+  private async verifyRefreshToken(token: string): Promise<boolean> {
+    try {
+      const { refreshTokenSecretKey } = this.configService.get('jwt');
+
+      await this.jwtService.verify<RefreshPayload>(token, {
+        secret: refreshTokenSecretKey,
+      });
+
+      return true;
+    } catch (error: any) {
+      return false;
+    }
+  }
+
+  private async generateTokens(
+    payload: Omit<JwtPayload, 'sessionId'>,
+  ): Promise<{
     accessToken: string;
     refreshToken: string;
   }> {

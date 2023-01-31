@@ -24,7 +24,4 @@ export class AuthEntity implements IAuth {
 
   @Column({ nullable: false })
   password: string;
-
-  @Column({ default: '' })
-  refreshToken: string;
 }

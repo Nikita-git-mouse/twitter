@@ -1,37 +1,33 @@
+import { Redis, InjectRedis } from '@nestjs-modules/ioredis';
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
-
-import { ConfigInterface } from '../../../config';
-import { JwtPayload } from '../core';
+import { SESSION_ID_COOKIE_NAME_TOKEN } from '../core';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
   constructor(
-    private readonly configService: ConfigService<ConfigInterface>,
-    private readonly jwtService: JwtService,
+    @InjectRedis()
+    private readonly redis: Redis,
   ) {}
 
   async use(req: Request, res: Response, next: (error?: any) => void) {
-    const bearerToken = req.headers.authorization;
+    const sessionId = req.cookies[SESSION_ID_COOKIE_NAME_TOKEN];
 
-    if (!bearerToken) {
+    if (!sessionId) {
       return next();
     }
 
-    const [, token] = bearerToken.split(' ');
+    const text = await this.redis.get(sessionId);
 
-    const { accessTokenSecretKey } = this.configService.get('jwt');
+    if (!text) {
+      return next();
+    }
 
     try {
-      const isVerify = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: accessTokenSecretKey,
-      });
+      const user = JSON.parse(text);
 
-      req.user = isVerify;
-    } catch (error: any) {}
-
-    next();
+      req.user = { sessionId, ...user };
+    } catch {}
+    return next();
   }
 }

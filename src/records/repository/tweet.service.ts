@@ -23,6 +23,7 @@ import {
     GetAllAccessedRecordsByUserIdResult,
     GetAllRecordsParams,
     GetAllRecordsResult,
+    GetAllRetweetsParams,
     GetByUserIdAndRecordIdParams,
     GetByUserIdAndRecordIdResult,
     GetRecordParams,
@@ -47,7 +48,7 @@ import {
       private readonly eventEmmiter: EventEmitter2,
     ) {}
   
-    async addRecord(params: AddRecordParams): Promise<AddRecordResult> {
+    async addTweet(params: AddRecordParams): Promise<AddRecordResult> {
         const { file, userId, access, fileName } = params;
     
         const { extension, filename } =
@@ -69,13 +70,13 @@ import {
     
         return { data: newRecord };
       }
-    
-      async getRecordSource(
+   
+      async getTweetSource(
         params: GetRecordSourceParams,
       ): Promise<GetRecordSourceResult> {
         const { recordId, userId } = params;
     
-        const record = await this.getRecord({ recordId, userId });
+        const record = await this.getTweet({ recordId, userId });
     
         const stream = await this.fileStorageService.createReadStreamFile(
           record.data.pathToFile,
@@ -84,12 +85,12 @@ import {
         return { data: stream };
       }
     
-      async getUserRecordSource(
+      async getUserTweetSource(
         params: GetUserRecordSourceParams,
       ): Promise<GetUserRecordSourceResult> {
         const { recordId, userId, fromUserId } = params;
     
-        const record = await this.getByUserIdAndRecordId({
+        const record = await this.getByUserIdAndTweetId({
           fromUserId,
           recordId,
           userId,
@@ -102,7 +103,7 @@ import {
         return { data: stream };
       }
     
-      async getRecord(params: GetRecordParams): Promise<GetRecordResult> {
+      async getTweet(params: GetRecordParams): Promise<GetRecordResult> {
         const { userId, recordId } = params;
     
         const wall = await this.wallService.getByUserId({ userId });
@@ -129,7 +130,9 @@ import {
         };
       }
     
-      async getAllUserRecords(
+
+
+      async getAllUserTweets(
         params: GetAllRecordsParams,
       ): Promise<GetAllRecordsResult> {
         const { userId } = params;
@@ -145,6 +148,8 @@ import {
             wall: {
               id: wall.data.id,
             },
+            isComment: false,
+            isRetweet: false
           },
         });
     
@@ -153,7 +158,7 @@ import {
         };
       }
     
-      async getAllAccessedRecordsByUserId(
+      async getAllAccessedTweetsByUserId(
         params: GetAllAccessedRecordsByUserIdParams,
       ): Promise<GetAllAccessedRecordsByUserIdResult> {
         const { userId, fromUserId } = params;
@@ -183,6 +188,8 @@ import {
             wall: {
               id: wall.data.id,
             },
+            isComment: false,
+            isRetweet: false
           },
         });
     
@@ -203,7 +210,7 @@ import {
         };
       }
     
-      async getByUserIdAndRecordId(
+      async getByUserIdAndTweetId(
         params: GetByUserIdAndRecordIdParams,
       ): Promise<GetByUserIdAndRecordIdResult> {
         const { userId, fromUserId, recordId } = params;
@@ -234,6 +241,8 @@ import {
             wall: {
               id: wall.data.id,
             },
+            isComment: false,
+            isRetweet: false
           },
         });
     

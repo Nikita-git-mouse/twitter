@@ -44,14 +44,15 @@ import { RecordEntity } from '../entity/record.entity';
   @Injectable()
   export class CommentService {
     constructor(
-      private readonly recordsRepository: RecordRepository,
       private readonly fileStorageService: FileStorageService,
       private readonly wallService: WallService,
       private readonly wallPermissionService: WallPermissionService,
       private readonly recordsPermissionService: RecordPermissionService,
       private readonly eventEmmiter: EventEmitter2,
       @InjectRepository(RecordEntity)
-      private readonly recordRepository: TreeRepository<RecordEntity>,
+      private readonly recordsRepository: TreeRepository<RecordEntity>
+    //   @InjectRepository(RecordEntity)
+    //   private readonly recordRepository: TreeRepository<RecordEntity>,
     ) {}
   
     async addRecord(params: AddRecordParams): Promise<AddRecordResult> {
@@ -272,11 +273,11 @@ import { RecordEntity } from '../entity/record.entity';
       }
 
   async findChildren(recordId: number): Promise<RecordEntity[]> {
-    const record = await this.recordRepository.findOne({ 
+    const record = await this.recordsRepository.findOne({ 
         where: {
         isComment: true,
         id: recordId,
       }, });
-    return this.recordRepository.findDescendants(record);
+    return this.recordsRepository.findDescendants(record);
   }
 }

@@ -6,6 +6,16 @@ export interface AddRecordParams {
   fileName: string;
   access: boolean;
   file: Express.Multer.File;
+
+}
+
+
+export interface AddRetweetParams {
+  userId: number;
+  fileName: string;
+  access: boolean;
+  file: Express.Multer.File;
+  recordId: IRecord;
 }
 
 export interface AddRecordResult {
@@ -15,6 +25,11 @@ export interface AddRecordResult {
 export interface GetAllRecordsParams {
   userId: number;
 }
+
+export interface GetAllRetweetsParams {
+  userId: number;
+}
+
 
 export interface GetAllRecordsResult {
   data: Array<IRecord>;

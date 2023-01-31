@@ -19,6 +19,7 @@ import {
   
   import { AuthGuard } from '../../auth/guards';
   import { TweetService } from '../repository/tweet.service';
+  import { RecordService } from '../repository';
   import { AddRecordInput, UpdateRecordInput } from './inputs';
   
   @ApiTags('Tweet')
@@ -26,7 +27,10 @@ import {
   @UseGuards(AuthGuard)
   @Controller('tweet')
   export class TweetController {
-    constructor(private recordService: TweetService) {}
+    constructor(
+      private tweetService: TweetService,
+      private recordService: RecordService
+      ) {}
   
     @Post()
     @UseInterceptors(FileInterceptor('tweet'))
@@ -38,7 +42,7 @@ import {
     ) {
       const { id } = request.user;
   
-      const { data } = await this.recordService.addRecord({
+      const { data } = await this.tweetService.addTweet({
         ...input,
         file,
         userId: id,
@@ -51,26 +55,12 @@ import {
     async getAllRecords(@Req() request: Request) {
       const { id } = request.user;
   
-      const { data } = await this.recordService.getAllUserRecords({ userId: id });
+      const { data } = await this.tweetService.getAllUserTweets({ userId: id });
   
       return data;
     }
   
-    @Get('/:tweetId')
-    async getRecord(
-      @Req() request: Request,
-      @Param('tweetId') recordId: string,
-    ) {
-      const { id } = request.user;
-  
-      const { data } = await this.recordService.getRecord({
-        recordId: +recordId,
-        userId: id,
-      });
-  
-      return data;
-    }
-  
+    
     @Get('/users/:userId')
     async getAllAccessedRecordsByUserId(
       @Req() request: Request,
@@ -78,7 +68,7 @@ import {
     ) {
       const { id } = request.user;
   
-      const { data } = await this.recordService.getAllAccessedRecordsByUserId({
+      const { data } = await this.tweetService.getAllAccessedTweetsByUserId({
         fromUserId: id,
         userId: +userId,
       });
@@ -94,7 +84,7 @@ import {
     ) {
       const { id } = request.user;
   
-      const { data } = await this.recordService.getByUserIdAndRecordId({
+      const { data } = await this.tweetService.getByUserIdAndTweetId({
         fromUserId: id,
         recordId: +recordId,
         userId: +userId,
@@ -112,7 +102,7 @@ import {
     ) {
       const { id } = request.user;
   
-      const { data } = await this.recordService.getUserRecordSource({
+      const { data } = await this.tweetService.getUserTweetSource({
         recordId: +recordId,
         fromUserId: id,
         userId: +userId,
@@ -120,5 +110,21 @@ import {
   
       return data.pipe(response);
     }
+
+    @Get('/:tweetId')
+    async getRecord(
+      @Req() request: Request,
+      @Param('tweetId') recordId: string,
+    ) {
+      const { id } = request.user;
+  
+      const { data } = await this.tweetService.getTweet({
+        recordId: +recordId,
+        userId: id,
+      });
+  
+      return data;
+    }
   }
   
+

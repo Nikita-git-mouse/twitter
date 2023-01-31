@@ -13,23 +13,26 @@ import {
     UseGuards,
     UseInterceptors,
   } from '@nestjs/common';
+  import { TreeRepository } from 'typeorm';
   import { FileInterceptor } from '@nestjs/platform-express';
   import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
-  import { Request, Response } from 'express';
+  import { request, Request, Response } from 'express';
   
   import { AuthGuard } from '../../auth/guards';
 import { RecordEntity } from '../entity/record.entity';
   import { CommentService } from '../repository/comment.service';
 import { RecordRepository } from '../repository/record.repository';
   import { AddRecordInput, UpdateRecordInput } from './inputs';
+import { InjectRepository } from '@nestjs/typeorm';
   
   @ApiTags('Records')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Controller('records')
-  export class RecordController {
+  export class CommentController {
     constructor(private recordService: CommentService,
-    private readonly recordRepository: RecordRepository) {}
+    @InjectRepository(RecordEntity)
+    private readonly recordsRepository: TreeRepository<RecordEntity>) {}
   
     @Post()
     @UseInterceptors(FileInterceptor('tweet'))
@@ -67,9 +70,29 @@ import { RecordRepository } from '../repository/record.repository';
     //   @Req() request: Request,
       @Param('tweetId') recordId: number): Promise<RecordEntity[]>
      {
-        const record = await this.recordRepository.findOne({ id: recordId });
-        return this.recordRepository.findDescendants(record);
+        const record = await this.recordsRepository.findOne({
+            where: {
+                id: recordId,
+              }, });
+        return this.recordsRepository.findDescendants(record);
     }
+    // @Get('/:tweetId')
+    // async record(
+    //   @Req() request: Request,
+    //   @Param('tweetId') recordId: string,
+    // ) {
+    //   const { id } = request.user;
+  
+    //   const { data } = await this.recordService.getRecord({
+    //     recordId: +recordId,
+    //     userId: id,
+    //   });
+  
+    //   return data;
+    // }
+
+
+
   
     @Get('/users/:userId')
     async getAllAccessedRecordsByUserId(

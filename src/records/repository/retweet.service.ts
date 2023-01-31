@@ -15,10 +15,12 @@ import {
   import {
     AddRecordParams,
     AddRecordResult,
+    AddRetweetParams,
     GetAllAccessedRecordsByUserIdParams,
     GetAllAccessedRecordsByUserIdResult,
     GetAllRecordsParams,
     GetAllRecordsResult,
+    GetAllRetweetsParams,
     GetByUserIdAndRecordIdParams,
     GetByUserIdAndRecordIdResult,
     GetRecordParams,
@@ -43,8 +45,8 @@ import {
       private readonly eventEmmiter: EventEmitter2,
     ) {}
   
-    async addRecord(params: AddRecordParams): Promise<AddRecordResult> {
-      const { file, userId, access, fileName } = params;
+    async addRetweet(params: AddRetweetParams): Promise<AddRecordResult> {
+      const { file, userId, access, fileName, recordId } = params;
   
       const { extension, filename } =
         await this.fileStorageService.saveFileViaBuffer(file);
@@ -55,7 +57,8 @@ import {
         pathToFile: filename,
         type: extension,
         isComment: false,
-        isRetweet: false
+        isRetweet: true,
+        parentRecord: recordId
       });
   
       this.eventEmmiter.emit('record.created', {
@@ -125,8 +128,8 @@ import {
       };
     }
   
-    async getAllUserRecords(
-      params: GetAllRecordsParams,
+    async GetAllUserRetweets(
+      params: GetAllRetweetsParams,
     ): Promise<GetAllRecordsResult> {
       const { userId } = params;
   
@@ -141,6 +144,10 @@ import {
           wall: {
             id: wall.data.id,
           },
+          isComment: false,
+          isRetweet: true,
+          parentRecord: true 
+          
         },
       });
   

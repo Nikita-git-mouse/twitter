@@ -42,7 +42,6 @@ export class RecordEntity implements IRecord{
   isRetweet: boolean;
 
   @TreeParent()
-  // @ManyToOne(() => RecordEntity, (entity) => entity.twitterRecords)
   parentRecord: RecordEntity;
   
   @TreeChildren()

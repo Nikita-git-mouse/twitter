@@ -18,7 +18,7 @@ import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
 import { AuthGuard } from '../../auth/guards';
-import { RecordService } from '../repository/record.service';
+import { RecordService } from '../repository/records/record.service';
 import { AddRecordInput, UpdateRecordInput } from './inputs';
 
 @ApiTags('Records')

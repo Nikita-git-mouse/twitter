@@ -15,11 +15,9 @@ import { ILike } from './likes.model';
     @PrimaryGeneratedColumn()
     id: number;
   
-    @ManyToOne(() => UserEntity) 
-    //@JoinColumn({ name: 'record_id' })
+    @ManyToOne(() => RecordEntity, (record) => record.likes)
     record: RecordEntity;
   
     @ManyToOne(() => UserEntity)
-    //@JoinColumn({ name: 'user_id' })
     user: UserEntity;
   }

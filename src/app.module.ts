@@ -27,6 +27,11 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { RefreshTokenEntity } from './auth/entity/refreshTokens.entity';
 import { SessionEntity } from './sessions/session.entity';
 import { SessionModule } from './sessions/session.module';
+import { ImageEntity } from './records/entity/image.entity';
+import { LikeEntity } from './likes/entity/likes.entity';
+import { FollowEntity } from './follow/entity/follow.entity';
+import { BanEntity } from './ban/entity/ban.entity';
+import { BanModule } from './ban/ban.module';
 
 @Module({
   imports: [
@@ -53,6 +58,10 @@ import { SessionModule } from './sessions/session.module';
             RecordEntity,
             RecordPermissionEntity,
             WallPermissionEntity,
+            ImageEntity,
+            LikeEntity,
+            FollowEntity,
+            BanEntity,
           ],
           username,
           password,
@@ -73,8 +82,9 @@ import { SessionModule } from './sessions/session.module';
     WallModule,
     JwtModule,
     SessionModule,
-    // FollowModule,
-    // LikesModule,
+    LikesModule,
+    FollowModule,
+    BanModule,
     RedisModule.forRoot({
       config: {
         url: 'redis://localhost:8379',

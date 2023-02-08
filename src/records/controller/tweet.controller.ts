@@ -18,7 +18,7 @@ import {
   import { Request, Response } from 'express';
   
   import { AuthGuard } from '../../auth/guards';
-  import { TweetService } from '../repository/tweet.service';
+  import { TweetService } from '../repository/records/tweet.service';
   import { RecordService } from '../repository';
   import { AddRecordInput, UpdateRecordInput } from './inputs';
   
@@ -28,12 +28,10 @@ import {
   @Controller('tweet')
   export class TweetController {
     constructor(
-      private tweetService: TweetService,
-      private recordService: RecordService
-      ) {}
+      private tweetService: TweetService) {}
   
     @Post()
-    @UseInterceptors(FileInterceptor('tweet'))
+    @UseInterceptors(FileInterceptor('record'))
     @ApiConsumes('multipart/form-data')
     async addNewRecord(
       @Req() request: Request,
@@ -93,23 +91,23 @@ import {
       return data;
     }
   
-    @Get('/users/:userId/:tweetId/source')
-    async getUserRecordSource(
-      @Req() request: Request,
-      @Res() response: Response,
-      @Param('userId') userId: string,
-      @Param('tweetId') recordId: string,
-    ) {
-      const { id } = request.user;
+    // @Get('/users/:userId/:tweetId/source')
+    // async getUserRecordSource(
+    //   @Req() request: Request,
+    //   @Res() response: Response,
+    //   @Param('userId') userId: string,
+    //   @Param('tweetId') recordId: string,
+    // ) {
+    //   const { id } = request.user;
   
-      const { data } = await this.tweetService.getUserTweetSource({
-        recordId: +recordId,
-        fromUserId: id,
-        userId: +userId,
-      });
+    //   const { data } = await this.tweetService.getUserTweetSource({
+    //     recordId: +recordId,
+    //     fromUserId: id,
+    //     userId: +userId,
+    //   });
   
-      return data.pipe(response);
-    }
+    //   return data.pipe(response);
+    // }
 
     @Get('/:tweetId')
     async getRecord(

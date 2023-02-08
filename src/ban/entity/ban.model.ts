@@ -1,7 +1,7 @@
 import { IUser } from '../../users/entity/user.model';
 
-export interface IFollow {
+export interface IBan {
   id: number;
-  subscriber: IUser;
-  subscription: IUser;
+  bannedUser: IUser;
+  banningUser: IUser;
 }

@@ -1,6 +1,8 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, OneToMany} from 'typeorm';
 import { IRecord } from './record.model';
 import { WallEntity } from '../../records-wall/entity/wall.entity';
+import { ImageEntity } from './image.entity';
+import { LikeEntity } from 'src/likes/entity/likes.entity';
 
 
 // @Entity()
@@ -35,29 +37,27 @@ export class RecordEntity implements IRecord{
   @Column('text')
   text: string;
 
-  @Column({ default: true })
+  @Column({ default: false })
   isComment: boolean;
   
   @Column({ default: false })
   isRetweet: boolean;
 
+  @ManyToOne(() => RecordEntity, (entity) => entity.twitterRecords, { nullable: true })
   @TreeParent()
-  parentRecord: RecordEntity;
-  
+  parentRecord: RecordEntity | null;
+
+  @OneToMany(() => RecordEntity, (entity) => entity.parentRecord)
   @TreeChildren()
-  // @OneToMany(() => RecordEntity, (entity) => entity.parentRecord)
   twitterRecords: RecordEntity[];
 
   @Column({ default: true })
   access: boolean;
 
-  // @OneToMany(type => Like, like => like.twitterRecord)
-  // likes: Like[];
-  
-  @Column({ nullable: false, unique: true })
-  pathToFile: string;
+  @OneToMany(() => ImageEntity, (entity) => entity.record)
+  images: ImageEntity[];
 
-  @Column({ default: true })
-  type: string;
-  
+  @OneToMany(() => LikeEntity, (entity) => entity.record)
+  likes: LikeEntity[];
+
 }

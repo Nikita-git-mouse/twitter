@@ -1,9 +1,11 @@
 import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { JwtPayload } from '../auth/core';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthGuard } from '../auth/guards';
 import { SessionService } from './session.service';
 
+@ApiTags('Sessions')
 @Controller('sessions')
 @UseGuards(AuthGuard)
 export class SessionController {

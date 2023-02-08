@@ -4,16 +4,16 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from '../../users/entity/user.entity'; // ************
-import { IFollow } from './follow.model';
+import { IBan } from './ban.model';
 
 @Entity()
-export class FollowEntity implements IFollow {
+export class BanEntity implements IBan {
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => UserEntity)
-  subscriber: UserEntity;
+  bannedUser: UserEntity;
 
   @ManyToOne(() => UserEntity)
-  subscription: UserEntity;
+  banningUser: UserEntity;
 }

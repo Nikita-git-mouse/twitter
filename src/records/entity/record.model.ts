@@ -1,4 +1,6 @@
 import { IWall } from 'src/records-wall/entity/wall.model';
+import { ImageEntity } from './image.entity';
+import { IImage } from './image.model';
 
 
 export interface IRecord {
@@ -7,11 +9,10 @@ export interface IRecord {
   text: string;
   isComment: boolean;
   isRetweet: boolean;
-  parentRecord: IRecord;
+  parentRecord: IRecord | null;
   twitterRecords: IRecord[];
-  pathToFile: string;
   access: boolean;
-  type: string;
+  images: IImage[];
 }
 
 // export interface IRecord {

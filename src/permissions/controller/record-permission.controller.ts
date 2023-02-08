@@ -8,7 +8,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { AuthGuard } from '../../auth/guards';
@@ -36,10 +36,11 @@ export class RecordPermissionController {
   }
 
   @Post('/:recordId')
+  // @ApiConsumes('multipart/form-data')
   async addNewPermission(
     @Req() request: Request,
+    @Param('recordId') recordId: string,
     @Body() input: UpdatePermissionInput,
-    @Param() recordId: string,
   ) {
     const { id } = request.user;
 

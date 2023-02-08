@@ -17,7 +17,7 @@ export class EmailService {
 
     await this.mailerService.sendMail({
       to: email,
-      subject: 'Gallery Cloud',
+      subject: 'Twitter',
       template: './auth-message', // `.hbs` extension is appended automatically
       context: {
         redirectUri,

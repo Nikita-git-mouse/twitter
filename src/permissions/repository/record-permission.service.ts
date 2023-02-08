@@ -109,7 +109,7 @@ export class RecordPermissionService {
       raw = data.raw;
     } else {
       const newPermission = await this.recordPermissionRepository.save({
-        id: permission.id,
+        //id: permission.id,
         access,
         record: {
           id: recordId,

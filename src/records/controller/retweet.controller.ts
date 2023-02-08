@@ -18,7 +18,7 @@ import {
   import { Request, Response } from 'express';
   
   import { AuthGuard } from '../../auth/guards';
-  import { RetweetService } from '../repository/retweet.service';
+  import { RetweetService } from '../repository/records/retweet.service';
   import { AddRecordInput, AddRetweetInput, UpdateRecordInput } from './inputs';
   
   @ApiTags('Retweet')
@@ -29,7 +29,7 @@ import {
     constructor(private retweetService: RetweetService) {}
   
     @Post()
-    @UseInterceptors(FileInterceptor('retweet'))
+    @UseInterceptors(FileInterceptor('record'))
     @ApiConsumes('multipart/form-data')
     async addRetweet(
       @Req() request: Request,
@@ -37,13 +37,11 @@ import {
       @UploadedFile() file: Express.Multer.File,
     ) {
       const { id } = request.user;
-  
+      
       const { data } = await this.retweetService.addRetweet({
         ...input,
         file,
         userId: id,
-        access: true,
-        recordId: undefined
       });
   
       return data;
@@ -61,7 +59,7 @@ import {
     @Get('/:retweetId')
     async getRecord(
       @Req() request: Request,
-      @Param('tweetId') recordId: string,
+      @Param('retweetId') recordId: string,
     ) {
       const { id } = request.user;
   
@@ -72,7 +70,7 @@ import {
   
       return data;
     }
-  
+
     @Get('/users/:userId')
     async getAllAccessedRecordsByUserId(
       @Req() request: Request,
@@ -105,22 +103,22 @@ import {
       return data;
     }
   
-    @Get('/users/:userId/:retweetId/source')
-    async getUserRecordSource(
-      @Req() request: Request,
-      @Res() response: Response,
-      @Param('userId') userId: string,
-      @Param('retweetId') recordId: string,
-    ) {
-      const { id } = request.user;
+  //   @Get('/users/:userId/:retweetId/source')
+  //   async getUserRecordSource(
+  //     @Req() request: Request,
+  //     @Res() response: Response,
+  //     @Param('userId') userId: string,
+  //     @Param('retweetId') recordId: string,
+  //   ) {
+  //     const { id } = request.user;
   
-      const { data } = await this.retweetService.getUserRecordSource({
-        recordId: +recordId,
-        fromUserId: id,
-        userId: +userId,
-      });
+  //     const { data } = await this.retweetService.getUserRecordSource({
+  //       recordId: +recordId,
+  //       fromUserId: id,
+  //       userId: +userId,
+  //     });
   
-      return data.pipe(response);
-    }
+  //     return data.pipe(response);
+  //   }
+  // }
   }
-  

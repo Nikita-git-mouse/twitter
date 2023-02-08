@@ -1,1 +1,1 @@
-export * from './record.service'
+export * from './records/record.service'

@@ -4,12 +4,12 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { WallService } from '../../records-wall/repository/wall.service';
+import { WallService } from '../../../records-wall/repository/wall.service';
 import {
   WallPermissionService,
   RecordPermissionService,
-} from '../../permissions';
-import { FileStorageService } from '../filestorage';
+} from '../../../permissions';
+import { FileStorageService } from '../../filestorage';
 import { RecordRepository } from './record.repository';
 
 import {
@@ -85,7 +85,7 @@ export class RecordService {
 
     await this.recordsRepository.delete({ id: record.data.id });
 
-    await this.fileStorageService.deleteFile(record.data.pathToFile);
+    //await this.fileStorageService.deleteFile(record.data.pathToFile);
 
     return;
   }

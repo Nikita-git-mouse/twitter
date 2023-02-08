@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, isNumber, IsNumber, IsString } from 'class-validator';
 import { IRecord } from 'src/records/entity/record.model';
 
 export class AddRetweetInput {
@@ -9,8 +9,8 @@ export class AddRetweetInput {
   @Transform(({ value }) => {
     return Boolean(value === 'true');
   })
-  @IsString()
-  access: string;
+  @IsBoolean()
+  access: boolean;
 
   @ApiProperty({ type: String, nullable: false })
   @IsString()
@@ -21,6 +21,7 @@ export class AddRetweetInput {
 
   @ApiProperty({ type: Number, nullable: false })
   @IsNumber()
-  parentRecordId: number;
+  @Type(() => Number)
+  recordId: number;
+  
 }
-

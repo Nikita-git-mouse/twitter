@@ -4,5 +4,4 @@ export interface IUser {
   name: string;
   surname: string;
   middleName: string;
-  profileUri: string;
 }

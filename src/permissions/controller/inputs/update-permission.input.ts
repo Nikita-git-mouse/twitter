@@ -12,4 +12,10 @@ export class UpdatePermissionInput {
   @IsNumber()
   @IsNotEmpty()
   specificUserId: number;
+
+  // @ApiProperty({ type: Number, nullable: false })
+  // @IsNumber()
+  // @IsNotEmpty()
+  // recordId: number;
+
 }

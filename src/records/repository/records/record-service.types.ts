@@ -1,5 +1,5 @@
 import { ReadStream } from 'fs';
-import { IRecord } from '../entity/record.model';
+import { IRecord } from '../../entity/record.model';
 
 export interface AddRecordParams {
   userId: number;
@@ -15,7 +15,7 @@ export interface AddRetweetParams {
   fileName: string;
   access: boolean;
   file: Express.Multer.File;
-  recordId: IRecord;
+  recordId: number;
 }
 
 export interface AddRecordResult {

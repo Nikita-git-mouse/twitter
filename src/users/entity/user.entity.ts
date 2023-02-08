@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { FollowEntity } from 'src/follow/entity/follow.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IUser } from './user.model';
 
 @Entity()
@@ -17,7 +18,4 @@ export class UserEntity implements IUser {
 
   @Column({ nullable: false })
   middleName: string;
-
-  @Column({ default: '' })
-  profileUri: string;
 }

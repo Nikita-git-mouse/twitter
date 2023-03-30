@@ -34,7 +34,7 @@ export class RecordEntity implements IRecord{
   @ManyToOne(() => WallEntity, (entity) => entity.records)
   wall: WallEntity;
 
-  @Column('text')
+  @Column('text', {default: ''})
   text: string;
 
   @Column({ default: false })

@@ -6,15 +6,15 @@ export interface AddRecordParams {
   fileName: string;
   access: boolean;
   file: Express.Multer.File;
-
 }
-
 
 export interface AddRetweetParams {
   userId: number;
-  fileName: string;
-  access: boolean;
-  file: Express.Multer.File;
+  recordId: number;
+}
+
+export interface AddRetweetQuoteParams {
+  userId: number;
   recordId: number;
 }
 

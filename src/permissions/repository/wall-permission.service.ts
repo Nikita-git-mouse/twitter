@@ -99,7 +99,7 @@ export class WallPermissionService {
       raw = data.raw;
     } else {
       const newPermission = await this.wallPermissionRepository.save({
-        id: permission.id,
+        //id: permission.id,
         access,
         wall: wall.data,
         specificUser: {

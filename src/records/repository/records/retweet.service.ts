@@ -46,23 +46,19 @@ export class RetweetService {
   ) {}
 
   async addRetweet(params: AddRetweetParams): Promise<AddRecordResult> {
-    const { file, userId, access, fileName, recordId } = params;
+    const { userId, recordId } = params;
 
-    const { extension, filename } =
-      await this.fileStorageService.saveFileViaBuffer(file);
     
-    
-    const parentRecord = await this.recordsRepository.findOne({ where: { id: recordId } });
+    const parentRecord = await this.recordsRepository.findOne(
+      { 
+        where: { id: recordId }
+       });
 
     const parents = await this.recordsRepository.findAncestors(parentRecord)
 
     const originalParentTweetId = parentRecord.isRetweet ? parents[parents.length-2] : parents[parents.length-1] 
 
     const newRecord = await this.recordsRepository.save({
-      access,
-      text: fileName,
-      pathToFile: filename,
-      type: extension,
       isComment: false,
       isRetweet: true,
       parentRecord: originalParentTweetId

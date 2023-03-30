@@ -34,13 +34,12 @@ import {
     async addRetweet(
       @Req() request: Request,
       @Body() input: AddRetweetInput,
-      @UploadedFile() file: Express.Multer.File,
+      //@UploadedFile() file: Express.Multer.File,
     ) {
       const { id } = request.user;
       
       const { data } = await this.retweetService.addRetweet({
         ...input,
-        file,
         userId: id,
       });
   
